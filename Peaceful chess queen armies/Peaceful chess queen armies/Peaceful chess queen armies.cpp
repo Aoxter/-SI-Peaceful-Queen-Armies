@@ -35,11 +35,11 @@ public:
 	{
 		// Basic rules of the model
 		for (int i = size_of_board * size_of_board; i--; ) {
-			// w[i] means that no blacks are allowed on A[i]
+			// white_placement[i] means that no blacks are allowed on A[i]
 			rel(*this, white_placement[i] == (unattacked_squares || A[i]));
 			// Make sure blacks and whites are disjoint.
 			rel(*this, !white_placement[i] || !black_placement[i]);
-			// If i in U, then b[i] has a piece.
+			// If i in unattacked_squares, then black_placement[i] has a piece.
 			rel(*this, black_placement[i] == (singleton(i) <= unattacked_squares));
 		}
 
@@ -47,7 +47,7 @@ public:
 		linear(*this, white_placement, IRT_EQ, nr_queens_placed);
 		linear(*this, black_placement, IRT_GQ, nr_queens_placed);
 
-		// Connect cardinality of U to the number of black pieces.
+		// Connect cardinality of unattacked_squares to the number of black pieces.
 		IntVar unknowns = expr(*this, cardinality(unattacked_squares));
 		rel(*this, nr_queens_placed <= unknowns);
 		linear(*this, white_placement, IRT_EQ, unknowns);
@@ -118,7 +118,6 @@ public:
 					start = i;
 					return true;
 				}
-			// No non-assigned orders left
 			return false;
 		}
 		virtual Gecode::Choice* choice(Space& home) {
