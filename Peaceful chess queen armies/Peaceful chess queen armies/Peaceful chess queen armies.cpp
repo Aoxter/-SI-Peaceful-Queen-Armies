@@ -2,11 +2,14 @@
 #include <gecode/int.hh>
 #include <gecode/minimodel.hh>
 #include <gecode/set.hh>
+#include <vector>
 
 using namespace Gecode;
 using namespace std;
 
 IntSet* A;
+vector<vector<BOOL>> wyniki_white = {};
+vector<vector<BOOL>> wyniki_black = {};
 
 class QueenArmies : public IntMaximizeScript {
 public:
@@ -80,13 +83,19 @@ public:
 	virtual void
 		print(std::ostream& os) const {
 		os << '\t';
+		vector<BOOL> temp_white;
+		vector<BOOL> temp_black;
 		for (int i = 0; i < size_of_board*size_of_board; ++i) {
+			temp_white.push_back(white_placement[i].val());
+			temp_black.push_back(black_placement[i].val());
 			if (white_placement[i].assigned() && white_placement[i].val()) os << "W";
 			else if (black_placement[i].assigned() && black_placement[i].val()) os << "B";
 			else if (!white_placement[i].assigned() && !black_placement[i].assigned()) os << " ";
 			else os << ".";
 			if ((i + 1) % size_of_board == 0) os << std::endl << (i != (size_of_board*size_of_board - 1) ? "\t" : "");
 		}
+		wyniki_white.push_back(temp_white);
+		wyniki_black.push_back(temp_black);
 		os << "Number of white queens: " << nr_queens_placed << std::endl << std::endl;
 	}
 
@@ -179,51 +188,71 @@ int pos(int i, int j, int n) {
 
 int
 main(int argc, char* argv[]) {
-	int x = 0;
-	cout << "Podaj rozmiar planszy : " << endl;
-	cin >> x;
-	SizeOptions opt("QueenArmies");
-	opt.size(x);
-	opt.branching(QueenArmies::BRANCH_SPECIFIC);
-	opt.branching(QueenArmies::BRANCH_NAIVE, "naive");
-	opt.branching(QueenArmies::BRANCH_SPECIFIC, "specific");
-	opt.solutions(0);
-	opt.parse(argc, argv);
+	while (1)
+	{
+		int x = 0;
+		cout << "Podaj rozmiar planszy : " << endl;
+		cin >> x;
+		if (x == 0) {
+			break;
+		}
+		SizeOptions opt("QueenArmies");
+		opt.size(x);
+		opt.branching(QueenArmies::BRANCH_SPECIFIC);
+		opt.branching(QueenArmies::BRANCH_NAIVE, "naive");
+		opt.branching(QueenArmies::BRANCH_SPECIFIC, "specific");
+		opt.solutions(0);
+		opt.parse(argc, argv);
 
-	// Set up the A-sets
-	// A[i] will contain the values attacked by a queen at position i
-	int n = opt.size();
-	A = new IntSet[max(n*n, 25)];
-	int *p = new int[n*n];
-	int pn = 0;
-	for (int i = n; i--; ) {
-		for (int j = n; j--; ) {
-			int dir[][2] = {
-			  { 0,  1},
-			  { 1,  1},
-			  { 1,  0},
-			  { 0, -1},
-			  {-1, -1},
-			  {-1,  0},
-			  { 1, -1},
-			  {-1,  1}
-			};
-			p[pn++] = pos(i, j, n);
-			for (int k = 8; k--; ) {
-				for (int l = 0; l < n
-					&& 0 <= (i + l * dir[k][0]) && (i + l * dir[k][0]) < n
-					&& 0 <= (j + l * dir[k][1]) && (j + l * dir[k][1]) < n; ++l) {
-					p[pn++] = pos(i + l * dir[k][0], j + l * dir[k][1], n);
+		// Set up the A-sets
+		// A[i] will contain the values attacked by a queen at position i
+		int n = opt.size();
+		A = new IntSet[max(n*n, 25)];
+		int *p = new int[n*n];
+		int pn = 0;
+		for (int i = n; i--; ) {
+			for (int j = n; j--; ) {
+				int dir[][2] = {
+				  { 0,  1},
+				  { 1,  1},
+				  { 1,  0},
+				  { 0, -1},
+				  {-1, -1},
+				  {-1,  0},
+				  { 1, -1},
+				  {-1,  1}
+				};
+				p[pn++] = pos(i, j, n);
+				for (int k = 8; k--; ) {
+					for (int l = 0; l < n
+						&& 0 <= (i + l * dir[k][0]) && (i + l * dir[k][0]) < n
+						&& 0 <= (j + l * dir[k][1]) && (j + l * dir[k][1]) < n; ++l) {
+						p[pn++] = pos(i + l * dir[k][0], j + l * dir[k][1], n);
+					}
 				}
+
+				A[pos(i, j, n)] = IntSet(p, pn);
+
+				pn = 0;
 			}
+		}
+		delete[] p;
 
-			A[pos(i, j, n)] = IntSet(p, pn);
-
-			pn = 0;
+		IntMaximizeScript::run<QueenArmies, BAB, SizeOptions>(opt);
+		cout << "Black" << endl;
+		for (auto row = wyniki_black.begin(); row != wyniki_black.end(); row++) {
+			for (auto col = row->begin(); col != row->end(); col++) {
+				cout << *col;
+			}
+			cout << endl;
+		}
+		cout <<endl <<"White" << endl;
+		for (auto row = wyniki_white.begin(); row != wyniki_white.end(); row++) {
+			for (auto col = row->begin(); col != row->end(); col++) {
+				cout << *col;
+			}
+			cout << endl;
 		}
 	}
-	delete[] p;
-
-	IntMaximizeScript::run<QueenArmies, BAB, SizeOptions>(opt);
 	return 0;
 }
