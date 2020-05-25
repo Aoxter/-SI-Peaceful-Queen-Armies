@@ -50,7 +50,7 @@ public:
 		linear(*this, white_placement, IRT_EQ, nr_queens_placed);
 		linear(*this, black_placement, IRT_GQ, nr_queens_placed);
 
-		// Connect cardinality of unattacked_squares to the number of black pieces.
+		// Connect cardinality of unattacked_squares to the number of white pieces.
 		IntVar unknowns = expr(*this, cardinality(unattacked_squares));
 		rel(*this, nr_queens_placed <= unknowns);
 		linear(*this, white_placement, IRT_EQ, unknowns);
@@ -86,12 +86,13 @@ public:
 		vector<BOOL> temp_white;
 		vector<BOOL> temp_black;
 		for (int i = 0; i < size_of_board*size_of_board; ++i) {
+			cout << "|";
 			temp_white.push_back(white_placement[i].val());
 			temp_black.push_back(black_placement[i].val());
-			if (white_placement[i].assigned() && white_placement[i].val()) os << "W";
-			else if (black_placement[i].assigned() && black_placement[i].val()) os << "B";
+			if (white_placement[i].assigned() && white_placement[i].val()) os << "W|";
+			else if (black_placement[i].assigned() && black_placement[i].val()) os << "B|";
 			else if (!white_placement[i].assigned() && !black_placement[i].assigned()) os << " ";
-			else os << ".";
+			else os << ".|";
 			if ((i + 1) % size_of_board == 0) os << std::endl << (i != (size_of_board*size_of_board - 1) ? "\t" : "");
 		}
 		wyniki_white.push_back(temp_white);
@@ -190,11 +191,13 @@ int
 main(int argc, char* argv[]) {
 	while (1)
 	{
+		wyniki_white.clear();
+		wyniki_black.clear();
 		int x = 0;
 		cout << "Podaj rozmiar planszy : " << endl;
 		cin >> x;
-		if (x == 0) {
-			break;
+		if (x <=2 ) {
+			cout<<"Board too small"<<endl;
 		}
 		SizeOptions opt("QueenArmies");
 		opt.size(x);
@@ -207,7 +210,7 @@ main(int argc, char* argv[]) {
 		// Set up the A-sets
 		// A[i] will contain the values attacked by a queen at position i
 		int n = opt.size();
-		A = new IntSet[max(n*n, 25)];
+		A = new IntSet[max(n*n, 0)];
 		int *p = new int[n*n];
 		int pn = 0;
 		for (int i = n; i--; ) {
@@ -239,19 +242,39 @@ main(int argc, char* argv[]) {
 		delete[] p;
 
 		IntMaximizeScript::run<QueenArmies, BAB, SizeOptions>(opt);
-		cout << "Black" << endl;
-		for (auto row = wyniki_black.begin(); row != wyniki_black.end(); row++) {
-			for (auto col = row->begin(); col != row->end(); col++) {
-				cout << *col;
+		if (wyniki_white.empty() != 1)
+		{
+			int smallest = count(wyniki_white[0].begin(), wyniki_white[0].end(), 1);
+			cout << smallest << endl;
+			for (int i = smallest - 1; i > 0; i--) {
+				auto temp_vec = wyniki_white[0];
+				auto position = std::find(temp_vec.begin(), temp_vec.end(), 1);
+				int index = position - temp_vec.begin();
+				temp_vec.erase(temp_vec.begin() + index);
+				temp_vec.insert(temp_vec.begin(), 0);
+				wyniki_white.insert(wyniki_white.begin(), temp_vec);
+
+				temp_vec = wyniki_black[0];
+				position = std::find(temp_vec.begin(), temp_vec.end(), 1);
+				index = position - temp_vec.begin();
+				temp_vec.erase(temp_vec.begin() + index);
+				temp_vec.insert(temp_vec.begin(), 0);
+				wyniki_black.insert(wyniki_black.begin(), temp_vec);
 			}
-			cout << endl;
-		}
-		cout <<endl <<"White" << endl;
-		for (auto row = wyniki_white.begin(); row != wyniki_white.end(); row++) {
-			for (auto col = row->begin(); col != row->end(); col++) {
-				cout << *col;
+			cout << "Black" << endl;
+			for (auto row = wyniki_black.begin(); row != wyniki_black.end(); row++) {
+				for (auto col = row->begin(); col != row->end(); col++) {
+					cout << *col;
+				}
+				cout << endl;
 			}
-			cout << endl;
+			cout << endl << "White" << endl;
+			for (auto row = wyniki_white.begin(); row != wyniki_white.end(); row++) {
+				for (auto col = row->begin(); col != row->end(); col++) {
+					cout << *col;
+				}
+				cout << endl;
+			}
 		}
 	}
 	return 0;
