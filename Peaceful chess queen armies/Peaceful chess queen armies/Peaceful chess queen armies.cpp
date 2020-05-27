@@ -261,6 +261,7 @@ main(int argc, char* argv[]) {
 				temp_vec.insert(temp_vec.begin(), 0);
 				wyniki_black.insert(wyniki_black.begin(), temp_vec);
 			}
+			// DISPLAYING FOR TEST
 			cout << "Black" << endl;
 			for (auto row = wyniki_black.begin(); row != wyniki_black.end(); row++) {
 				for (auto col = row->begin(); col != row->end(); col++) {
@@ -274,6 +275,27 @@ main(int argc, char* argv[]) {
 					cout << *col;
 				}
 				cout << endl;
+			}
+			// HERE IS DISPLAYING
+			for (int row = 0; row < wyniki_white.size(); row++){
+				for (int i = 0; i < n*n; i++) {
+					cout << "|";
+					if (wyniki_white[row][i] == 1) {
+						cout << "W|";
+					}
+					else {
+						if (wyniki_black[row][i] == 1) {
+							cout << "B|";
+						}
+						else {
+							cout << ".|";
+						}
+					}
+					if ((i + 1) % n == 0) {
+						cout << endl;
+					}
+				}
+				cout << "---------" << endl;
 			}
 		}
 	}
