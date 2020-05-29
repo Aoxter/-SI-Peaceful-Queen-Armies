@@ -169,6 +169,9 @@
   <ItemGroup>
     <ClCompile Include="Peaceful chess queen armies.cpp" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="MainWindow.ui" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
