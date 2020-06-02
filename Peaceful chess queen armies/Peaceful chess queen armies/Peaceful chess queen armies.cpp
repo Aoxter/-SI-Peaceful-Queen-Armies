@@ -188,7 +188,7 @@ int pos(int i, int j, int n) {
 }
 
 int
-main(int argc, char* argv[]) {
+tmain(int argc, char* argv[]) {
 	while (1)
 	{
 		wyniki_white.clear();
