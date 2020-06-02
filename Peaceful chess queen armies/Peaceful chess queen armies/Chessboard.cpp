@@ -1,9 +1,12 @@
 #include<windows.h>
 #include<glut.h>
+#include <iostream>
+using namespace std;
 
-
-int c = 0;
-int chessboard_size = 10;
+// n must be +1 larger than chessboard size
+int n = 4;
+int c = 1;
+int chessboard_size = 3;
 int army_size = 1;
 void init()
 {
@@ -12,7 +15,7 @@ void init()
 	// Choosing the type of projection
 	glMatrixMode(GL_PROJECTION);
 	// for setting the transformation which here is 2D
-	gluOrtho2D(0, 800, 0, 600);
+	gluOrtho2D(0, n*100, 0, n*100);
 }
 
 void drawSquare(GLint x1, GLint y1, GLint x2, GLint y2, GLint x3, GLint y3, GLint x4, GLint y4)
@@ -42,13 +45,13 @@ void chessboard()
 {
 	glClear(GL_COLOR_BUFFER_BIT); // Clear display window
 	GLint x, y;
-	int x_step = 800 / chessboard_size;
-	int y_step = 600 / chessboard_size;
-	for (x = 0; x <= 800; x += x_step)
+	int x_step = n*100 / chessboard_size;
+	int y_step = n*100 / chessboard_size;
+	for (x = 0; x <= n*100; x += x_step)
 	{
-		for (y = 0; y <= 600; y += y_step)
+		for (y = 0; y <= n*100; y += y_step)
 		{
-			drawSquare(x, y + 75, x + 100, y + 75, x + 100, y, x, y);
+			drawSquare(x, y + 100, x + 100, y + 100, x + 100, y, x, y);
 		}
 	}
 	// Process all OpenGL routine s as quickly as possible
@@ -63,9 +66,9 @@ int main(int agrc, char** argv)
 	// Set display mode
 	glutInitDisplayMode(GLUT_SINGLE | GLUT_RGB);
 	// Set top - left display window position.
-	glutInitWindowPosition(100, 100);
+	glutInitWindowPosition(0,0);
 	// Set display window width and height
-	glutInitWindowSize(800, 600);
+	glutInitWindowSize(n*100, n*100);
 	// Create display window with the given title
 	glutCreateWindow("Chess Board using OpenGL in C++");
 	// Execute initialization procedure
