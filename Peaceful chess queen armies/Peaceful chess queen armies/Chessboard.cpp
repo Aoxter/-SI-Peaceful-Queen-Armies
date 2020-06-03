@@ -3,11 +3,23 @@
 #include <iostream>
 using namespace std;
 
-// n must be +1 larger than chessboard size
-int n = 4;
 int c = 1;
-int chessboard_size = 3;
+int chessboard_size = 10;
+// n must be +1 larger than chessboard size
+int n = chessboard_size;
+int x_global = n * 100;
+int y_global = n * 80;
+int x_step_global = 100;
+int y_step_global = 80;
 int army_size = 1;
+
+bool isEvenNumber(int number) {
+	if (number % 2 == 0)
+		return true;
+	else
+		return false;
+}
+
 void init()
 {
 	// For displaying the window color
@@ -15,11 +27,14 @@ void init()
 	// Choosing the type of projection
 	glMatrixMode(GL_PROJECTION);
 	// for setting the transformation which here is 2D
-	gluOrtho2D(0, n*100, 0, n*100);
+	gluOrtho2D(0, x_global, 0, y_global);
 }
 
 void drawSquare(GLint x1, GLint y1, GLint x2, GLint y2, GLint x3, GLint y3, GLint x4, GLint y4)
 {
+	if (c == 0) std::cout << "white - ";
+	else std::cout << "black - ";
+	std::cout << " x1 " << x1 << " y1 " << y1 << " x2 " << x2 << " y2 " << y2 << " x3 " << x3 << " y3 " << y3 << " x4 " << x4 << " y4 " << y4 << std::endl;
 	// if color is 0 then draw white box and change value of color = 1
 	if (c == 0)
 	{
@@ -45,19 +60,29 @@ void chessboard()
 {
 	glClear(GL_COLOR_BUFFER_BIT); // Clear display window
 	GLint x, y;
-	int x_step = n*100 / chessboard_size;
-	int y_step = n*100 / chessboard_size;
-	for (x = 0; x <= n*100; x += x_step)
-	{
-		for (y = 0; y <= n*100; y += y_step)
+	int x_step = x_global / chessboard_size;
+	int y_step = y_global / chessboard_size;
+	if (isEvenNumber(chessboard_size)) {
+		for (x = 0; x <= x_global; x += x_step)
 		{
-			drawSquare(x, y + 100, x + 100, y + 100, x + 100, y, x, y);
+			for (y = 0; y <= y_global; y += y_step)
+			{
+				drawSquare(x, y + y_step_global, x + x_step_global, y + y_step_global, x + x_step_global, y, x, y);
+			}
 		}
 	}
+	else {
+		for (x = 0; x < x_global; x += x_step)
+		{
+			for (y = 0; y < y_global; y += y_step)
+			{
+				drawSquare(x, y + y_step_global, x + x_step_global, y + y_step_global, x + x_step_global, y, x, y);
+			}
+		}
+	}	
 	// Process all OpenGL routine s as quickly as possible
 	glFlush();
 }
-
 
 int main(int agrc, char** argv)
 {
@@ -68,7 +93,7 @@ int main(int agrc, char** argv)
 	// Set top - left display window position.
 	glutInitWindowPosition(0,0);
 	// Set display window width and height
-	glutInitWindowSize(n*100, n*100);
+	glutInitWindowSize(x_global, y_global);
 	// Create display window with the given title
 	glutCreateWindow("Chess Board using OpenGL in C++");
 	// Execute initialization procedure
