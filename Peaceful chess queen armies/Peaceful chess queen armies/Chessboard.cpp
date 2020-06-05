@@ -4,7 +4,7 @@
 using namespace std;
 
 int c = 1;
-int chessboard_size = 10;
+int chessboard_size = 4;
 // n must be +1 larger than chessboard size
 int n = chessboard_size;
 int x_global = n * 100;
@@ -12,6 +12,7 @@ int y_global = n * 80;
 int x_step_global = 100;
 int y_step_global = 80;
 int army_size = 1;
+int d, offset = 2;
 
 bool isEvenNumber(int number) {
 	if (number % 2 == 0)
@@ -32,9 +33,7 @@ void init()
 
 void drawSquare(GLint x1, GLint y1, GLint x2, GLint y2, GLint x3, GLint y3, GLint x4, GLint y4)
 {
-	if (c == 0) std::cout << "white - ";
-	else std::cout << "black - ";
-	std::cout << " x1 " << x1 << " y1 " << y1 << " x2 " << x2 << " y2 " << y2 << " x3 " << x3 << " y3 " << y3 << " x4 " << x4 << " y4 " << y4 << std::endl;
+	std::cout << "drawing square " << std::endl;
 	// if color is 0 then draw white box and change value of color = 1
 	if (c == 0)
 	{
@@ -56,6 +55,63 @@ void drawSquare(GLint x1, GLint y1, GLint x2, GLint y2, GLint x3, GLint y3, GLin
 	glVertex2i(x4, y4);
 	glEnd();
 }
+
+void triangle(int a, int b, int c, int d, int e, int f) //display unfilled triangle
+{
+	glLineWidth(1);
+	glBegin(GL_LINE_LOOP);
+	glVertex2i(a, b);
+	glVertex2i(c, d);
+	glVertex2i(e, f);
+	glEnd();
+
+
+}
+void rectangle(int a, int b, int c, int d) //display filled rectangle
+{
+	glBegin(GL_POLYGON);
+	glVertex2i(a, b);
+	glVertex2i(c, b);
+	glVertex2i(c, d);
+	glVertex2i(a, d);
+	glEnd();
+
+}
+void circle(int x, int y, int r) //display filled circle of radius 'r'
+{
+
+	glHint(GL_POINT_SMOOTH_HINT, GL_NICEST);
+	glPointSize(r);
+	glBegin(GL_POINTS);
+	glVertex2f(x, y);
+	glEnd();
+
+}
+
+void queen(int x, int y, int color)
+//function to display Queen wrt to (x,y) position. (x,y) is center of the Queen
+{
+	std::cout << "Hello2" << std::endl;
+	if (color == 0)
+		glColor3ub(57, 94, 144);
+	else if (color == 1)
+		glColor3ub(30, 5, 34);
+	else
+		glColor3ub(36, 185, 26);
+	x = x * d + offset + d / 2;
+	y = y * d + offset + d / 2;
+	glLineWidth(1);
+	glPointSize(1);
+	triangle(x - d / 25, y + d / 2.778, x + d / 25, y + d / 2.778, x, y + d / 2.439);
+	rectangle(x - d / 11.11, y + d / 2.778, x + d / 11.11, y + d / 3.333);
+	circle(x, y + d / 5, d / 5.555);
+	rectangle(x - d / 25, y + d / 10, x + d / 25, y + d / 20);
+	rectangle(x - d / 11.11, y + d / 20, x + d / 11.11, y);
+	rectangle(x - d / 16.667, y, x + d / 16.667, y - d / 4.166);
+	rectangle(x - d / 11.11, y - d / 4.167, x + d / 11.111, y - d / 3.448);
+	rectangle(x - d / 9.09, y - d / 3.448, x + d / 9.09, y - d / 2.564);
+}
+
 void chessboard()
 {
 	glClear(GL_COLOR_BUFFER_BIT); // Clear display window
@@ -79,7 +135,9 @@ void chessboard()
 				drawSquare(x, y + y_step_global, x + x_step_global, y + y_step_global, x + x_step_global, y, x, y);
 			}
 		}
-	}	
+	}
+	std::cout << "Hello" << std::endl;
+	queen(50, 40, 2);
 	// Process all OpenGL routine s as quickly as possible
 	glFlush();
 }
