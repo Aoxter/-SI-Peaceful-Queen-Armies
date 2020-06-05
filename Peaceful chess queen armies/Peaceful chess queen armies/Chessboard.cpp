@@ -12,7 +12,8 @@ int y_global = n * 80;
 int x_step_global = 100;
 int y_step_global = 80;
 int army_size = 1;
-int d, offset = 2;
+// d - size of queens, offset - change position
+int d=80, offset = 2;
 
 bool isEvenNumber(int number) {
 	if (number % 2 == 0)
@@ -88,6 +89,24 @@ void circle(int x, int y, int r) //display filled circle of radius 'r'
 
 }
 
+void drawFilledelipse(GLfloat x, GLfloat y, GLfloat xcenter, GLfloat ycenter) {
+	int i;
+	int triangleAmount = 20; //# of triangles used to draw circle
+
+	//GLfloat radius = 0.8f; //radius
+	GLfloat twicePi = 2.0f * (3.14);
+	glColor3f(0, 1, 0);
+	glBegin(GL_TRIANGLE_FAN);
+	glVertex2f(x, y); // center of circle
+	for (i = 0; i <= triangleAmount; i++) {
+		glVertex2f(
+			x + ((xcenter + 1)* cos(i * twicePi / triangleAmount)),
+			y + ((ycenter - 1)* sin(i * twicePi / triangleAmount))
+		);
+	}
+	glEnd();
+}
+
 void queen(int x, int y, int color)
 //function to display Queen wrt to (x,y) position. (x,y) is center of the Queen
 {
@@ -98,10 +117,12 @@ void queen(int x, int y, int color)
 		glColor3ub(30, 5, 34);
 	else
 		glColor3ub(36, 185, 26);
-	x = x * d + offset + d / 2;
-	y = y * d + offset + d / 2;
+	cout << x << "x" << y << endl;
+
 	glLineWidth(1);
 	glPointSize(1);
+	cout << x <<"x"<< y << endl;
+	cout << x - d / 25 << "x" << y + d / 2.778 << "x" << x + d / 25 << "x" << y + d / 2.778 <<"x"<< x << "x" << y + d / 2.439 << endl;
 	triangle(x - d / 25, y + d / 2.778, x + d / 25, y + d / 2.778, x, y + d / 2.439);
 	rectangle(x - d / 11.11, y + d / 2.778, x + d / 11.11, y + d / 3.333);
 	circle(x, y + d / 5, d / 5.555);
@@ -137,7 +158,8 @@ void chessboard()
 		}
 	}
 	std::cout << "Hello" << std::endl;
-	queen(50, 40, 2);
+	queen(50, 120, 2);
+	queen(150, 200, 1);
 	// Process all OpenGL routine s as quickly as possible
 	glFlush();
 }
