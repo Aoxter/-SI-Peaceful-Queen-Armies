@@ -1,5 +1,7 @@
+/*
 #include<windows.h>
 #include<glut.h>
+#include <freeglut.h>
 #include <vector>
 #include <tuple>
 #include <iostream>
@@ -7,7 +9,7 @@ using namespace std;
 
 
 int field_color = 1;
-int chessboard_size = 3;
+int chessboard_size = 5;
 // int n = chessboard_size;
 int x_global = chessboard_size * 100;
 int y_global = chessboard_size * 80;
@@ -94,7 +96,7 @@ void circle(int x, int y, int r) //display filled circle of radius 'r'
 	glEnd();
 }
 
-void drawFilledelipse(GLfloat x, GLfloat y, GLfloat xcenter, GLfloat ycenter) 
+void drawFilledelipse(GLfloat x, GLfloat y, GLfloat xcenter, GLfloat ycenter)
 {
 	int i;
 	int triangleAmount = 20; //# of triangles used to draw circle
@@ -113,7 +115,7 @@ void drawFilledelipse(GLfloat x, GLfloat y, GLfloat xcenter, GLfloat ycenter)
 }
 
 void draw_queen(int x, int y, int color)
-	//function to display Queen wrt to (x,y) position. (x,y) is center of the Queen
+//function to display Queen wrt to (x,y) position. (x,y) is center of the Queen
 {
 	if (color == 0)
 		glColor3ub(57, 94, 144);
@@ -180,13 +182,13 @@ void chessboard()
 		int cord_y = get<1>(placesForQueens[*i]);
 		draw_queen(cord_x, cord_y, color_black);
 	}
-	/*draw_queen(50, 120, 2);
-	draw_queen(150, 200, 1);*/
+	//draw_queen(50, 120, 2);
+	//draw_queen(150, 200, 1);
 	// Process all OpenGL routine s as quickly as possible
 	glFlush();
 }
 
-int main(int agrc, char** argv)
+int tmain(int agrc, char** argv)
 {
 	white_queens.push_back(0);
 	black_queens.push_back(1);
@@ -196,20 +198,27 @@ int main(int agrc, char** argv)
 	black_queens.push_back(5);
 	white_queens.push_back(6);
 	black_queens.push_back(7);
-	// Initialize GLUT
-	glutInit(&agrc, argv);
-	// Set display mode
-	glutInitDisplayMode(GLUT_SINGLE | GLUT_RGB);
-	// Set top - left display window position.
-	glutInitWindowPosition(0, 0);
-	// Set display window width and height
-	glutInitWindowSize(x_global, y_global);
-	// Create display window with the given title
-	glutCreateWindow("Chess Board using OpenGL in C++");
-	// Execute initialization procedure
-	init();
-	// Send graphics to display window
-	glutDisplayFunc(chessboard);
-	// Display everything and wait.
-	glutMainLoop();
+	while (1)
+	{
+		// Initialize GLUT
+		glutInit(&agrc, argv);
+		// Set display mode
+		glutInitDisplayMode(GLUT_SINGLE | GLUT_RGB);
+		// Set top - left display window position.
+		glutInitWindowPosition(0, 0);
+		// Set display window width and height
+		glutInitWindowSize(x_global, y_global);
+		// Create display window with the given title
+		glutCreateWindow("Chess Board using OpenGL in C++");
+		// Execute initialization procedure
+		init();
+
+		// Send graphics to display window
+		glutDisplayFunc(chessboard);
+		glutSetOption(GLUT_ACTION_ON_WINDOW_CLOSE, GLUT_ACTION_GLUTMAINLOOP_RETURNS);
+		// Display everything and wait.
+		glutMainLoop();
+	}
+
 }
+*/
