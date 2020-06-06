@@ -1,19 +1,27 @@
 #include<windows.h>
 #include<glut.h>
+#include <vector>
+#include <tuple>
 #include <iostream>
 using namespace std;
 
-int c = 1;
-int chessboard_size = 4;
-// n must be +1 larger than chessboard size
-int n = chessboard_size;
-int x_global = n * 100;
-int y_global = n * 80;
+
+int field_color = 1;
+int chessboard_size = 3;
+// int n = chessboard_size;
+int x_global = chessboard_size * 100;
+int y_global = chessboard_size * 80;
 int x_step_global = 100;
 int y_step_global = 80;
-int army_size = 1;
+vector< tuple<int, int> > placesForQueens;
 // d - size of queens, offset - change position
-int d=80, offset = 2;
+int d = 80;
+int offset = 2;
+vector<int> black_queens;
+vector<int> white_queens;
+int color_white = 3;
+int color_black = 2;
+
 
 bool isEvenNumber(int number) {
 	if (number % 2 == 0)
@@ -36,16 +44,16 @@ void drawSquare(GLint x1, GLint y1, GLint x2, GLint y2, GLint x3, GLint y3, GLin
 {
 	std::cout << "drawing square " << std::endl;
 	// if color is 0 then draw white box and change value of color = 1
-	if (c == 0)
+	if (field_color == 0)
 	{
 		glColor3f(1, 1, 1); // white color value is 1 1 1
-		c = 1;
+		field_color = 1;
 	}
 	// if color is 1 then draw black box and change value of color = 0
 	else
 	{
 		glColor3f(0, 0, 0); // black color value is 0 0 0
-		c = 0;
+		field_color = 0;
 	}
 
 	// Draw Square
@@ -65,9 +73,8 @@ void triangle(int a, int b, int c, int d, int e, int f) //display unfilled trian
 	glVertex2i(c, d);
 	glVertex2i(e, f);
 	glEnd();
-
-
 }
+
 void rectangle(int a, int b, int c, int d) //display filled rectangle
 {
 	glBegin(GL_POLYGON);
@@ -76,53 +83,51 @@ void rectangle(int a, int b, int c, int d) //display filled rectangle
 	glVertex2i(c, d);
 	glVertex2i(a, d);
 	glEnd();
-
 }
+
 void circle(int x, int y, int r) //display filled circle of radius 'r'
 {
-
 	glHint(GL_POINT_SMOOTH_HINT, GL_NICEST);
 	glPointSize(r);
 	glBegin(GL_POINTS);
 	glVertex2f(x, y);
 	glEnd();
-
 }
 
-void drawFilledelipse(GLfloat x, GLfloat y, GLfloat xcenter, GLfloat ycenter) {
+void drawFilledelipse(GLfloat x, GLfloat y, GLfloat xcenter, GLfloat ycenter) 
+{
 	int i;
 	int triangleAmount = 20; //# of triangles used to draw circle
-
-	//GLfloat radius = 0.8f; //radius
+		//GLfloat radius = 0.8f; //radius
 	GLfloat twicePi = 2.0f * (3.14);
 	glColor3f(0, 1, 0);
 	glBegin(GL_TRIANGLE_FAN);
 	glVertex2f(x, y); // center of circle
 	for (i = 0; i <= triangleAmount; i++) {
 		glVertex2f(
-			x + ((xcenter + 1)* cos(i * twicePi / triangleAmount)),
-			y + ((ycenter - 1)* sin(i * twicePi / triangleAmount))
+			x + ((xcenter + 1) * cos(i * twicePi / triangleAmount)),
+			y + ((ycenter - 1) * sin(i * twicePi / triangleAmount))
 		);
 	}
 	glEnd();
 }
 
-void queen(int x, int y, int color)
-//function to display Queen wrt to (x,y) position. (x,y) is center of the Queen
+void draw_queen(int x, int y, int color)
+	//function to display Queen wrt to (x,y) position. (x,y) is center of the Queen
 {
-	std::cout << "Hello2" << std::endl;
 	if (color == 0)
 		glColor3ub(57, 94, 144);
 	else if (color == 1)
 		glColor3ub(30, 5, 34);
-	else
+	else if (color == 2)
 		glColor3ub(36, 185, 26);
+	else
+		glColor3ub(255, 215, 0);
 	cout << x << "x" << y << endl;
-
 	glLineWidth(1);
 	glPointSize(1);
-	cout << x <<"x"<< y << endl;
-	cout << x - d / 25 << "x" << y + d / 2.778 << "x" << x + d / 25 << "x" << y + d / 2.778 <<"x"<< x << "x" << y + d / 2.439 << endl;
+	cout << x << "x" << y << endl;
+	cout << x - d / 25 << "x" << y + d / 2.778 << "x" << x + d / 25 << "x" << y + d / 2.778 << "x" << x << "x" << y + d / 2.439 << endl;
 	triangle(x - d / 25, y + d / 2.778, x + d / 25, y + d / 2.778, x, y + d / 2.439);
 	rectangle(x - d / 11.11, y + d / 2.778, x + d / 11.11, y + d / 3.333);
 	circle(x, y + d / 5, d / 5.555);
@@ -145,6 +150,9 @@ void chessboard()
 			for (y = 0; y <= y_global; y += y_step)
 			{
 				drawSquare(x, y + y_step_global, x + x_step_global, y + y_step_global, x + x_step_global, y, x, y);
+				int mid_x = x + (x_step_global / 2);
+				int mid_y = y + (y_step_global / 2);
+				placesForQueens.push_back(tuple<int, int>(mid_x, mid_y));
 			}
 		}
 	}
@@ -154,24 +162,46 @@ void chessboard()
 			for (y = 0; y < y_global; y += y_step)
 			{
 				drawSquare(x, y + y_step_global, x + x_step_global, y + y_step_global, x + x_step_global, y, x, y);
+				int mid_x = x + (x_step_global / 2);
+				int mid_y = y + (y_step_global / 2);
+				placesForQueens.push_back(tuple<int, int>(mid_x, mid_y));
 			}
 		}
 	}
-	std::cout << "Hello" << std::endl;
-	queen(50, 120, 2);
-	queen(150, 200, 1);
+	for (vector<int>::iterator i = white_queens.begin(); i != white_queens.end(); i++)
+	{
+		int cord_x = get<0>(placesForQueens[*i]);
+		int cord_y = get<1>(placesForQueens[*i]);
+		draw_queen(cord_x, cord_y, color_white);
+	}
+	for (vector<int>::iterator i = black_queens.begin(); i != black_queens.end(); i++)
+	{
+		int cord_x = get<0>(placesForQueens[*i]);
+		int cord_y = get<1>(placesForQueens[*i]);
+		draw_queen(cord_x, cord_y, color_black);
+	}
+	/*draw_queen(50, 120, 2);
+	draw_queen(150, 200, 1);*/
 	// Process all OpenGL routine s as quickly as possible
 	glFlush();
 }
 
 int main(int agrc, char** argv)
 {
+	white_queens.push_back(0);
+	black_queens.push_back(1);
+	white_queens.push_back(2);
+	black_queens.push_back(3);
+	white_queens.push_back(4);
+	black_queens.push_back(5);
+	white_queens.push_back(6);
+	black_queens.push_back(7);
 	// Initialize GLUT
 	glutInit(&agrc, argv);
 	// Set display mode
 	glutInitDisplayMode(GLUT_SINGLE | GLUT_RGB);
 	// Set top - left display window position.
-	glutInitWindowPosition(0,0);
+	glutInitWindowPosition(0, 0);
 	// Set display window width and height
 	glutInitWindowSize(x_global, y_global);
 	// Create display window with the given title
