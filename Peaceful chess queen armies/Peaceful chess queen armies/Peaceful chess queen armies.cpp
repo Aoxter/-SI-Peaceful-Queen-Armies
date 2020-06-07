@@ -170,6 +170,8 @@ void chessboard()
 			}
 		}
 	}
+	cout << white_queens.size();
+	cout << black_queens.size();
 	for (vector<int>::iterator i = white_queens.begin(); i != white_queens.end(); i++)
 	{
 		int cord_x = get<0>(placesForQueens[*i]);
@@ -269,6 +271,7 @@ public:
 	virtual IntVar cost(void) const {
 		return nr_queens_placed;
 	}
+	
 	virtual void
 		print(std::ostream& os) const {
 		os << '\t';
@@ -288,6 +291,7 @@ public:
 		wyniki_black.push_back(temp_black);
 		os << "Number of white queens: " << nr_queens_placed << std::endl << std::endl;
 	}
+	
 
 	class QueenBranch : public Brancher {
 	private:
@@ -353,6 +357,7 @@ public:
 				? ES_FAILED
 				: ES_OK;
 		}
+		
 		virtual void print(const Space&, const Gecode::Choice& _c,
 			unsigned int a,
 			std::ostream& o) const {
@@ -360,6 +365,7 @@ public:
 			bool val = (a == 0) ? c.val : !c.val;
 			o << "w[" << c.pos << "] = " << val;
 		}
+		
 		virtual Actor* copy(Space& home) {
 			return new (home) QueenBranch(home, *this);
 		}
@@ -383,13 +389,17 @@ main(int argc, char* argv[]) {
 		wyniki_white.clear();
 		wyniki_black.clear();
 		int x = 0;
-		cout << "Podaj rozmiar planszy : " << endl;
+		cout << "Board size : " << endl;
 		cin >> x;
+		int searched_queens = 0;
+		cout << "How many queens: " << endl;
+		cin >> searched_queens;
 		chessboard_size = x;
 		x_global = chessboard_size * 100;
 		y_global = chessboard_size * 80;
 		if (x <=2 ) {
 			cout<<"Board too small"<<endl;
+			continue;
 		}
 		SizeOptions opt("QueenArmies");
 		opt.size(x);
@@ -453,21 +463,45 @@ main(int argc, char* argv[]) {
 				temp_vec.insert(temp_vec.begin(), 0);
 				wyniki_black.insert(wyniki_black.begin(), temp_vec);
 			}
+			if (wyniki_white.size() < searched_queens) {
+				cout << "There is no answer for this number of queens" << endl;
+				continue;
+			}
+			white_queens.clear();
+			black_queens.clear();
 			// DISPLAYING FOR TEST
 			cout << "Black" << endl;
+			int which = 1;
+			int counter = 0;
 			for (auto row = wyniki_black.begin(); row != wyniki_black.end(); row++) {
 				for (auto col = row->begin(); col != row->end(); col++) {
+					if (*col == 1 && which==searched_queens) {
+						black_queens.push_back(counter);
+						cout << counter;
+					}
+					counter++;
 					cout << *col;
 				}
 				cout << endl;
+				counter = 0;
+				which++;
 			}
+			which = 1;
 			cout << endl << "White" << endl;
 			for (auto row = wyniki_white.begin(); row != wyniki_white.end(); row++) {
 				for (auto col = row->begin(); col != row->end(); col++) {
+					if (*col == 1 && which == searched_queens) {
+						white_queens.push_back(counter);
+						cout << counter;
+					}
+					counter++;
 					cout << *col;
 				}
 				cout << endl;
+				counter = 0;
+				which++;
 			}
+			
 			// HERE IS DISPLAYING
 			for (int row = 0; row < wyniki_white.size(); row++){
 				for (int i = 0; i < n*n; i++) {
@@ -489,14 +523,9 @@ main(int argc, char* argv[]) {
 				}
 				cout << "---------" << endl;
 			}
-			white_queens.push_back(0);
-			black_queens.push_back(1);
-			white_queens.push_back(2);
-			black_queens.push_back(3);
-			white_queens.push_back(4);
-			black_queens.push_back(5);
-			white_queens.push_back(6);
-			black_queens.push_back(14);
+			
+
+			
 			
 			// Initialize GLUT
 			glutInit(&argc, argv);
