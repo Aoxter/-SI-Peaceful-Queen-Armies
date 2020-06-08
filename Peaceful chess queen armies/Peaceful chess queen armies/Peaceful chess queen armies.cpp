@@ -143,6 +143,7 @@ void draw_queen(int x, int y, int color)
 void chessboard()
 {
 	glClear(GL_COLOR_BUFFER_BIT); // Clear display window
+	placesForQueens.clear();
 	GLint x, y;
 	int x_step = x_global / chessboard_size;
 	int y_step = y_global / chessboard_size;
@@ -154,7 +155,7 @@ void chessboard()
 				drawSquare(x, y + y_step_global, x + x_step_global, y + y_step_global, x + x_step_global, y, x, y);
 				int mid_x = x + (x_step_global / 2);
 				int mid_y = y + (y_step_global / 2);
-				placesForQueens.push_back(tuple<int, int>(mid_x, mid_y));
+				if(mid_y < y_global && mid_x < x_global) placesForQueens.push_back(tuple<int, int>(mid_x, mid_y));
 			}
 		}
 	}
@@ -170,8 +171,12 @@ void chessboard()
 			}
 		}
 	}
-	cout << white_queens.size();
-	cout << black_queens.size();
+	//last field added here because for don't do it
+	int last_mid_x = x_global - (x_step_global / 2);
+	int last_mid_y = y_global - (y_step_global / 2);
+	placesForQueens.push_back(tuple<int, int>(last_mid_x, last_mid_y));
+	cout << "White army (Go):" << white_queens.size();
+	cout << "\nBlack army (Gr):" << black_queens.size() << endl;
 	for (vector<int>::iterator i = white_queens.begin(); i != white_queens.end(); i++)
 	{
 		int cord_x = get<0>(placesForQueens[*i]);
