@@ -25,8 +25,8 @@ int d = 80;
 int offset = 2;
 vector<int> black_queens;
 vector<int> white_queens;
-int color_white = 3;
-int color_black = 2;
+int color_white = 0;
+int color_black = 1;
 
 
 bool isEvenNumber(int number) {
@@ -121,13 +121,9 @@ void draw_queen(int x, int y, int color)
 //function to display Queen wrt to (x,y) position. (x,y) is center of the Queen
 {
 	if (color == 0)
-		glColor3ub(57, 94, 144);
+		glColor3ub(255, 255, 102);
 	else if (color == 1)
-		glColor3ub(30, 5, 34);
-	else if (color == 2)
-		glColor3ub(36, 185, 26);
-	else
-		glColor3ub(255, 215, 0);
+		glColor3ub(51, 25, 0);
 	glLineWidth(1);
 	glPointSize(1);
 	triangle(x - d / 25, y + d / 2.778, x + d / 25, y + d / 2.778, x, y + d / 2.439);
@@ -175,8 +171,6 @@ void chessboard()
 	int last_mid_x = x_global - (x_step_global / 2);
 	int last_mid_y = y_global - (y_step_global / 2);
 	placesForQueens.push_back(tuple<int, int>(last_mid_x, last_mid_y));
-	cout << "White army (Go):" << white_queens.size();
-	cout << "\nBlack army (Gr):" << black_queens.size() << endl;
 	for (vector<int>::iterator i = white_queens.begin(); i != white_queens.end(); i++)
 	{
 		int cord_x = get<0>(placesForQueens[*i]);
@@ -475,34 +469,34 @@ main(int argc, char* argv[]) {
 			white_queens.clear();
 			black_queens.clear();
 			// DISPLAYING FOR TEST
-			cout << "Black" << endl;
+			// cout << "Black" << endl;
 			int which = 1;
 			int counter = 0;
 			for (auto row = wyniki_black.begin(); row != wyniki_black.end(); row++) {
 				for (auto col = row->begin(); col != row->end(); col++) {
 					if (*col == 1 && which==searched_queens) {
 						black_queens.push_back(counter);
-						cout << counter;
+						// cout << counter;
 					}
 					counter++;
-					cout << *col;
+					// cout << *col;
 				}
-				cout << endl;
+				// cout << endl;
 				counter = 0;
 				which++;
 			}
 			which = 1;
-			cout << endl << "White" << endl;
+			// cout << endl << "White" << endl;
 			for (auto row = wyniki_white.begin(); row != wyniki_white.end(); row++) {
 				for (auto col = row->begin(); col != row->end(); col++) {
 					if (*col == 1 && which == searched_queens) {
 						white_queens.push_back(counter);
-						cout << counter;
+						// cout << counter;
 					}
 					counter++;
-					cout << *col;
+					// cout << *col;
 				}
-				cout << endl;
+				// cout << endl;
 				counter = 0;
 				which++;
 			}
