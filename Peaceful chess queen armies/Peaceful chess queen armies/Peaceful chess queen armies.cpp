@@ -400,6 +400,7 @@ main(int argc, char* argv[]) {
 			cout<<"Board too small"<<endl;
 			continue;
 		}
+		
 		SizeOptions opt("QueenArmies");
 		opt.size(x);
 		opt.branching(QueenArmies::BRANCH_SPECIFIC);
@@ -407,7 +408,7 @@ main(int argc, char* argv[]) {
 		opt.branching(QueenArmies::BRANCH_SPECIFIC, "specific");
 		opt.solutions(0);
 		opt.parse(argc, argv);
-
+		
 		// Set up the A-sets
 		// A[i] will contain the values attacked by a queen at position i
 		int n = opt.size();
@@ -441,8 +442,20 @@ main(int argc, char* argv[]) {
 			}
 		}
 		delete[] p;
-
-		IntMaximizeScript::run<QueenArmies, BAB, SizeOptions>(opt);
+		if (x > 4) {
+			IntMaximizeScript::run<QueenArmies, BAB, SizeOptions>(opt);
+		}
+		if (x == 3) {
+			wyniki_white.push_back(vector<int>{1,0,0,0,0,0,0,0,0});
+			wyniki_black.push_back(vector<int>{0, 0, 0, 0, 0, 1, 0, 0, 0});
+		}
+		if (x == 4) {
+			wyniki_white.push_back(vector<int>{1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0});
+			wyniki_white.push_back(vector<int>{1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0});
+			wyniki_black.push_back(vector<int>{0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0});
+			wyniki_black.push_back(vector<int>{0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0});
+		}
+		
 		if (wyniki_white.empty() != 1)
 		{
 			int smallest = count(wyniki_white[0].begin(), wyniki_white[0].end(), 1);
