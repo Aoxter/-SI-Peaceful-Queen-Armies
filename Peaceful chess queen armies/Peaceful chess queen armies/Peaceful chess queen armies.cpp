@@ -12,6 +12,175 @@
 using namespace std;
 
 
+float r=1, g=0, b=0;
+GLint x, y;
+float mX, mY;
+string queens="1",board="4",wykonaj="execute";
+int qcounter = 1,bcounter=4;
+bool check = false;
+void closing() {
+	glutSetOption(GLUT_ACTION_ON_WINDOW_CLOSE, GLUT_ACTION_GLUTMAINLOOP_RETURNS);
+	glutLeaveMainLoop();
+}
+void mouse(int button, int state, int mousex, int mousey)
+{
+	
+	if (button == GLUT_LEFT_BUTTON && state == GLUT_DOWN)
+	{
+		float d = glutGet(GLUT_WINDOW_WIDTH);
+		float b = glutGet(GLUT_WINDOW_HEIGHT);
+		mX= (mousex / d)*2 - 1.0f;
+		mY= ((mousey / b)*2 - 1.0f)*-1;
+
+		//uruchomienie
+		glClear(GL_COLOR_BUFFER_BIT);
+		if (mX>(-0.24) && mX<(0.2)) {
+			if (mY>(-0.65)&&mY<(-0.5)) {
+				closing();
+			}
+			
+		}
+		//left up
+		if (mX > (-0.4) && mX < (-0.2)) {
+			if (mY > (0.2) && mY < (0.4)) {
+				board = to_string(++bcounter);
+			}
+
+		}
+		//left down
+		if (mX > (-0.4) && mX < (-0.2)) {
+			if (mY > (-0.2) && mY < (0.0)) {
+				if (bcounter>0) {
+					board = to_string(--bcounter);
+				}
+				
+			}
+
+		}
+		//right up
+		if (mX > (0.2) && mX < (0.4)) {
+			if (mY > (0.2) && mY < (0.4)) {
+				queens = to_string(++qcounter);
+			}
+
+		}
+		if (mX > (0.2) && mX < (0.3)) {
+			if (mY > (-0.42) && mY < (-0.32)) {
+				if (r==0 &&g==1) {
+					r = 1, g = 0;
+					check = false;
+				}
+				else {
+					r = 0, g = 1;
+					check = true;
+				}
+			}
+
+		}
+		//right down
+		if (mX > (0.2) && mX < (0.4)) {
+			if (mY > (-0.2) && mY < (0.0)) {
+				if (qcounter>0) {
+					queens = to_string(--qcounter);
+				}
+				
+			}
+
+		}
+	}
+
+	else if (button == GLUT_RIGHT_BUTTON && state == GLUT_DOWN)
+	{
+		//glClearColor(1, 1, 1, 0);
+		//glClear(GL_COLOR_BUFFER_BIT);
+		//text = to_string(counter--);
+		//glClear(GL_COLOR_BUFFER_BIT);
+	}
+	glutPostRedisplay();
+}
+
+// global variables
+int text_x = 0, text_y = 0;
+void drawText(const std::string& text,float x, float y, const float r, const float g, const float b)
+{
+
+	glColor3f(r, g, b);
+	glRasterPos2f(x, y);
+	for (const char c : text)
+		glutBitmapCharacter(GLUT_BITMAP_HELVETICA_18, (int)c);
+}
+
+void print_str(void)
+{
+	glClear(GL_COLOR_BUFFER_BIT);
+	glMatrixMode(GL_PROJECTION);
+	glLoadIdentity();
+
+	//execute
+	glColor3f(1, 0, 0);
+	glBegin(GL_POLYGON);
+	glVertex2f(-0.24, -0.5);
+	glVertex2f(0.2, -0.5);
+	glVertex2f(0.2, -0.65);
+	glVertex2f(-0.24, -0.65);
+	glEnd();
+	drawText(wykonaj, -0.16, -0.6, 0.0, 0.0, 0.0);
+	//right up
+	glColor3f(0, 0, 0);
+	glBegin(GL_TRIANGLES);
+	glVertex2f(0.2, 0.2);
+	glVertex2f(0.4, 0.2);
+	glVertex2f(0.3, 0.4);
+	glEnd();
+	drawText("Queens:", 0.15, 0.55, 0.0, 0.0, 0.0);
+	//right down
+	glColor3f(0, 0, 0);
+	glBegin(GL_TRIANGLES);
+	glVertex2f(0.2, 0.0);
+	glVertex2f(0.4, 0.0);
+	glVertex2f(0.3, -0.2);
+	glEnd();
+	//left up
+	glColor3f(0, 0, 0);
+	glBegin(GL_TRIANGLES);
+	glVertex2f(-0.2, 0.2);
+	glVertex2f(-0.4, 0.2);
+	glVertex2f(-0.3, 0.4);
+	glEnd();
+	drawText("Board size:", -0.52, 0.55, 0.0, 0.0, 0.0);
+	//left down
+	glColor3f(0, 0, 0);
+	glBegin(GL_TRIANGLES);
+	glVertex2f(-0.2, 0.0);
+	glVertex2f(-0.4, 0.0);
+	glVertex2f(-0.3, -0.2);
+	glEnd();
+	//check box
+	glColor3f(r, g, b);
+	glBegin(GL_POLYGON);
+	glVertex2f(0.2, -0.32);
+	glVertex2f(0.3, -0.32);
+	glVertex2f(0.3, -0.42);
+	glVertex2f(0.2, -0.42);
+	glEnd();
+	drawText("Display Console:", -0.5, -0.4, 0.0, 0.0, 0.0);
+	//text
+	drawText(board,-0.33,0.05,   0.0,0.0,0.0);
+	drawText(queens, 0.27, 0.05, 0.0, 0.0, 0.0);
+
+
+	glutSwapBuffers();
+
+}
+
+
+
+
+
+
+
+
+
 int field_color = 1;
 int chessboard_size = 5;
 // int n = chessboard_size;
@@ -154,6 +323,7 @@ void chessboard()
 				if(mid_y < y_global && mid_x < x_global) placesForQueens.push_back(tuple<int, int>(mid_x, mid_y));
 			}
 		}
+		
 	}
 	else {
 		for (x = 0; x < x_global; x += x_step)
@@ -166,6 +336,13 @@ void chessboard()
 				placesForQueens.push_back(tuple<int, int>(mid_x, mid_y));
 			}
 		}
+		
+	}
+	if (field_color==0) {
+		field_color = 1;
+	}
+	else {
+		field_color = 0;
 	}
 	//last field added here because for don't do it
 	int last_mid_x = x_global - (x_step_global / 2);
@@ -238,7 +415,7 @@ public:
 
 		// Connect optimization variable to number of pieces
 		linear(*this, white_placement, IRT_EQ, nr_queens_placed);
-		linear(*this, black_placement, IRT_GQ, nr_queens_placed);
+		linear(*this, black_placement, IRT_EQ, nr_queens_placed);
 
 		// Connect cardinality of unattacked_squares to the number of white pieces.
 		IntVar unknowns = expr(*this, cardinality(unattacked_squares));
@@ -277,18 +454,23 @@ public:
 		vector<BOOL> temp_white;
 		vector<BOOL> temp_black;
 		for (int i = 0; i < size_of_board*size_of_board; ++i) {
-			cout << "|";
+			if (check == true) {
+				cout << "|";
+			}
 			temp_white.push_back(white_placement[i].val());
 			temp_black.push_back(black_placement[i].val());
-			if (white_placement[i].assigned() && white_placement[i].val()) os << "W|";
-			else if (black_placement[i].assigned() && black_placement[i].val()) os << "B|";
-			else if (!white_placement[i].assigned() && !black_placement[i].assigned()) os << " ";
-			else os << ".|";
-			if ((i + 1) % size_of_board == 0) os << std::endl << (i != (size_of_board*size_of_board - 1) ? "\t" : "");
+			if (check == true) {
+				if (white_placement[i].assigned() && white_placement[i].val()) os << "W|";
+				else if (black_placement[i].assigned() && black_placement[i].val()) os << "B|";
+				else if (!white_placement[i].assigned() && !black_placement[i].assigned()) os << " ";
+				else os << ".|";
+				if ((i + 1) % size_of_board == 0) os << std::endl << (i != (size_of_board*size_of_board - 1) ? "\t" : "");
+			}
+
 		}
 		wyniki_white.push_back(temp_white);
 		wyniki_black.push_back(temp_black);
-		os << "Number of white queens: " << nr_queens_placed << std::endl << std::endl;
+		//os << "Number of white queens: " << nr_queens_placed << std::endl << std::endl;
 	}
 	
 
@@ -385,14 +567,28 @@ int
 main(int argc, char* argv[]) {
 	while (1)
 	{
+		
+		glutInit(&argc, argv);
+		glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB);
+		glutInitWindowPosition(100, 100);
+		glutInitWindowSize(480, 480);
+		glutCreateWindow("Configuration");
+		glClearColor(1, 1, 1, 0);
+		glMatrixMode(GL_PROJECTION);
+		glutDisplayFunc(print_str);
+		glutMouseFunc(mouse);
+		glutMainLoop();
+
 		wyniki_white.clear();
 		wyniki_black.clear();
-		int x = 0;
-		cout << "Board size : " << endl;
-		cin >> x;
-		int searched_queens = 0;
-		cout << "How many queens: " << endl;
-		cin >> searched_queens;
+		//int x = 0;
+		//cout << "Board size : " << endl;
+		//cin >> x;
+		int x = bcounter;
+		int searched_queens = qcounter;
+		//int searched_queens = 0;
+		//cout << "How many queens: " << endl;
+		//cin >> searched_queens;
 		chessboard_size = x;
 		x_global = chessboard_size * 100;
 		y_global = chessboard_size * 80;
@@ -515,25 +711,28 @@ main(int argc, char* argv[]) {
 			}
 			
 			// HERE IS DISPLAYING
-			for (int row = 0; row < wyniki_white.size(); row++){
-				for (int i = 0; i < n*n; i++) {
-					cout << "|";
-					if (wyniki_white[row][i] == 1) {
-						cout << "W|";
-					}
-					else {
-						if (wyniki_black[row][i] == 1) {
-							cout << "B|";
+			if (check==true) {
+
+				for (int row = 0; row < wyniki_white.size(); row++){
+					for (int i = 0; i < n*n; i++) {
+						cout << "|";
+						if (wyniki_white[row][i] == 1) {
+							cout << "W|";
 						}
 						else {
-							cout << ".|";
+							if (wyniki_black[row][i] == 1) {
+								cout << "B|";
+							}
+							else {
+								cout << ".|";
+							}
+						}
+						if ((i + 1) % n == 0) {
+							cout << endl;
 						}
 					}
-					if ((i + 1) % n == 0) {
-						cout << endl;
-					}
+					cout << "---------" << endl;
 				}
-				cout << "---------" << endl;
 			}
 			
 
@@ -557,6 +756,7 @@ main(int argc, char* argv[]) {
 			glutSetOption(GLUT_ACTION_ON_WINDOW_CLOSE, GLUT_ACTION_GLUTMAINLOOP_RETURNS);
 			// Display everything and wait.
 			glutMainLoop();
+
 			
 		}
 	}
